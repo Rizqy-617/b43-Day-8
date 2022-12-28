@@ -52,7 +52,7 @@ func projectPage(w http.ResponseWriter, r *http.Request) {
 	tmpl.Execute(w, nil)
 }
 
-type dataType struct {
+type dataReceive struct {
 	ID int
 	Projectname string
 	Description string
@@ -63,7 +63,7 @@ type dataType struct {
 	Duration string
 }
 
-var dataSubmit = []data{
+var dataSubmit = []dataReceive{
 
 }
 
@@ -75,12 +75,27 @@ func addProject(w http.ResponseWriter, r *http.Request) {
 	}
 
 	projectname := r.PostForm.Get("project-name")
-	startDate := r.Form["technologies"]
+	startDate := r.PostForm.Get("start-date")
+	endDate := r.PostForm.Get("end-date")
+	description := r.PostForm.Get("description")
+	technologies := r.Form["technologies"]
 
-	// fmt.Println("Project Name : " + r.PostForm.Get("project-name"))
-	// fmt.Println("Start-date : " + r.PostForm.Get("start-date"))
-	// fmt.Println("End-date : " + r.PostForm.Get("end-date"))
-	// fmt.Println("Description : " + r.PostForm.Get("description"))
+
+	var newData = dataReceive{
+		Projectname: projectname,
+		Description: description,
+		Technologies: technologies,
+		Startdate: startDate,
+		Enddate: endDate,
+	} 
+
+	fmt.Println("Project Name : " + projectname)
+	fmt.Println("Start-date : " + startDate)
+	fmt.Println("End-date : " + endDate)
+	fmt.Println("Description : " + description)
+	fmt.Println("Technologies : ", r.Form["technologies"] )
+
+	dataSubmit = append(dataSubmit, newData)
 	
 	http.Redirect(w, r, "/", http.StatusMovedPermanently)
 }

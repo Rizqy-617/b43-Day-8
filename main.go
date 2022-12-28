@@ -2,8 +2,11 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"log"
 	"net/http"
+	"os"
+	"path/filepath"
 	"strconv"
 	"text/template"
 	"time"
@@ -105,7 +108,38 @@ func addProject(w http.ResponseWriter, r *http.Request) {
 	if dayDistance >= 0 {
 		duration =strconv.FormatInt(dayDistance, 10) + " Days"
 	}
-	
+
+	img, imgname, err := r.FormFile("image")
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte("Message : " + err.Error()))
+		return
+	}
+
+	defer img.Close()
+	dir, err := os.Getwd()
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte("Message : " + err.Error()))
+		return
+	}
+
+	filename := imgname.Filename
+	fileLocation := filepath.Join(dir, "public/uploaded-image", filename)
+	targetFile, err := os.OpenFile(fileLocation, os.O_WRONLY|os.O_CREATE, 0666)
+
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte("Message : " + err.Error()))
+		return
+	}
+
+	defer targetFile.Close()
+	if _, err := io.Copy(targetFile, img); err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte("Message : " + err.Error()))
+		return
+	}
 
 	var newData = dataReceive{
 		Projectname: projectname,
@@ -114,6 +148,7 @@ func addProject(w http.ResponseWriter, r *http.Request) {
 		Startdate: startDate,
 		Enddate: endDate,
 		Duration: duration,
+		Image: imgname.Filename,
 	} 
 
 	fmt.Println("Project Name : " + projectname)
@@ -122,6 +157,7 @@ func addProject(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Description : " + description)
 	fmt.Println("Technologies : ", r.Form["technologies"] )
 	fmt.Println("Duration : " + duration)
+	fmt.Println("Image : " + imgname.Filename)
 
 	dataSubmit = append(dataSubmit, newData)
 	

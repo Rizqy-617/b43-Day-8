@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 	"text/template"
+	"time"
 
 	"github.com/gorilla/mux"
 )
@@ -81,12 +83,37 @@ func addProject(w http.ResponseWriter, r *http.Request) {
 	technologies := r.Form["technologies"]
 
 
+	//Buat Durasi
+	const timeFormat = "2006-01-02"
+	timeStartDate, err := time.Parse(timeFormat, startDate)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte("Message : " + err.Error()))
+		return
+	}
+
+	timeEndDate, err := time.Parse(timeFormat, endDate)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte("Message : " + err.Error()))
+		return
+	}
+	distance := timeEndDate.Sub(timeStartDate)
+	dayDistance := int64(distance.Hours() / 24)
+
+	var duration string
+	if dayDistance >= 0 {
+		duration =strconv.FormatInt(dayDistance, 10) + " Days"
+	}
+	
+
 	var newData = dataReceive{
 		Projectname: projectname,
 		Description: description,
 		Technologies: technologies,
 		Startdate: startDate,
 		Enddate: endDate,
+		Duration: duration,
 	} 
 
 	fmt.Println("Project Name : " + projectname)
@@ -94,6 +121,7 @@ func addProject(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("End-date : " + endDate)
 	fmt.Println("Description : " + description)
 	fmt.Println("Technologies : ", r.Form["technologies"] )
+	fmt.Println("Duration : " + duration)
 
 	dataSubmit = append(dataSubmit, newData)
 	

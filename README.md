@@ -9,3 +9,5 @@
     - Add Detail Project Function on go 
     - Change Icon name
     - Add Project and Display Project is finished !!!!!!
+## Changelog 3
+    - Add weeks function to duration and it work!!

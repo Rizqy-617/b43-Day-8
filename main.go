@@ -19,7 +19,7 @@ func main() {
 
 	route.HandleFunc("/", homePage).Methods("GET")
 	route.HandleFunc("/project", projectPage).Methods("GET")
-	route.HandleFunc("/project{id}", detailProject).Methods("GET")
+	route.HandleFunc("/project/{id}", detailProject).Methods("GET")
 	route.HandleFunc("/project", addProject).Methods("POST")
 	route.HandleFunc("/contact", contactPage).Methods("GET")
 
@@ -100,11 +100,14 @@ func addProject(w http.ResponseWriter, r *http.Request) {
 
 	//Ubah milisecond menjadi bulan, minggu dan hari
 	monthDistance := int(distance.Hours() / 24 / 30)
+	weekDistance := int(distance.Hours() / 24 / 7)
 	daysDistance := int(distance.Hours() / 24)
 
 	var duration string
 	if monthDistance >= 1 && daysDistance <= 0{
 		duration = strconv.Itoa(monthDistance) + " months"
+	} else if monthDistance < 1 && weekDistance >= 1 {
+		duration = strconv.Itoa(weekDistance) + " weeks"
 	} else if monthDistance < 1 && daysDistance >= 0 {
 		duration = strconv.Itoa(daysDistance) + " days"
 	} else {

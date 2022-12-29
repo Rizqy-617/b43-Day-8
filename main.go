@@ -37,8 +37,12 @@ func homePage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	dataCaller := map[string]interface{} {
+		"Projects": dataSubmit,
+	}
+
 	w.WriteHeader(http.StatusOK)
-	tmpl.Execute(w, nil)
+	tmpl.Execute(w, dataCaller)
 }
 
 func projectPage(w http.ResponseWriter, r *http.Request) {
@@ -50,6 +54,7 @@ func projectPage(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("Message : " + err.Error()))
 		return
 	}
+
 
 	w.WriteHeader(http.StatusOK)
 	tmpl.Execute(w, nil)
@@ -87,25 +92,23 @@ func addProject(w http.ResponseWriter, r *http.Request) {
 
 	//Buat Durasi
 	const timeFormat = "2006-01-02"
-	timeStartDate, err := time.Parse(timeFormat, startDate) // januari 20 2003 -> 2003-01-20
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("Message : " + err.Error()))
-		return
-	}
+	timeStartDate, _:= time.Parse(timeFormat, startDate)
+	timeEndDate, _:= time.Parse(timeFormat, endDate)
 
-	timeEndDate, err := time.Parse(timeFormat, endDate)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("Message : " + err.Error()))
-		return
-	}
+	// Hitung jaraka
 	distance := timeEndDate.Sub(timeStartDate)
-	dayDistance := int64(distance.Hours() / 24)
+
+	//Ubah milisecond menjadi bulan, minggu dan hari
+	monthDistance := int(distance.Hours() / 24 / 30)
+	daysDistance := int(distance.Hours() / 24)
 
 	var duration string
-	if dayDistance >= 0 {
-		duration =strconv.FormatInt(dayDistance, 10) + " Days"
+	if monthDistance >= 1 && daysDistance <= 0{
+		duration = strconv.Itoa(monthDistance) + " months"
+	} else if monthDistance < 1 && daysDistance >= 0 {
+		duration = strconv.Itoa(daysDistance) + " days"
+	} else {
+		duration = "0 days"
 	}
 
 	// Input Image Start

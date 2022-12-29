@@ -85,15 +85,21 @@
             <div class="card-body me-5 ms-5">
                 <h2 class="text-center mb-2">My Project</h2>
                 <div class="row row-cols-2 row-cols-md-4 g-3">
+                    <!-- Dynamic Content Start -->
+                    {{ range $index, $data := .Projects }}
                     <div class="col">
                         <div class="card h-100">
                             <img src="/public/img/luca-bravo-XJXWbfSo2f0-unsplash.jpg" class="card-img-top">
                             <div class="card-body">
-                                <h5 class="card-title">Card title</h5>
-                                <p class="card-text">This is a longer card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
+                                <h5 class="card-title"><a href="/project/{$index}">{{$data.Projectname}}</a></h5>
+                                <h6>Duration: {{$data.Duration}}</h6>
+                                <p class="card-text">{{$data.Description}}</p>
                                 <div class="tech-icon fs-3">
-                                    <img src="/public/img/react-js-icon.svg" width="32px">
-                                    <img src="/public/img/node-js-icon.svg" width="32px">
+                                    {{ range $index, $data := $data.Technologies}}
+                                    <span class="icon">
+                                        <img src="/public/img/{{ $data }}.svg" style="width: 25px;">
+                                    </span>
+                                    {{end}}
                                 </div>
                                 <div class="card-button w-100 d-flex justify-content-between">
                                     <button class="btn btn-dark w-50 m-1">Edit</button>
@@ -102,74 +108,8 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col">
-                        <div class="card h-100">
-                            <img src="/public/img/luca-bravo-XJXWbfSo2f0-unsplash.jpg" class="card-img-top">
-                            <div class="card-body">
-                                <h5 class="card-title">Card title</h5>
-                                <p class="card-text">This is a longer card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
-                                <div class="tech-icon fs-3">
-                                    <img src="/public/img/react-js-icon.svg" width="32px">
-                                    <img src="/public/img/node-js-icon.svg" width="32px">
-                                </div>
-                                <div class="card-button w-100 d-flex justify-content-between">
-                                    <button class="btn btn-dark w-50 m-1">Edit</button>
-                                    <button class="btn btn-dark w-50 m-1">Delete</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col">
-                        <div class="card h-100">
-                            <img src="/public/img/luca-bravo-XJXWbfSo2f0-unsplash.jpg" class="card-img-top">
-                            <div class="card-body">
-                                <h5 class="card-title">Card title</h5>
-                                <p class="card-text">This is a longer card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
-                                <div class="tech-icon fs-3">
-                                    <img src="/public/img/react-js-icon.svg" width="32px">
-                                    <img src="/public/img/node-js-icon.svg" width="32px">
-                                </div>
-                                <div class="card-button w-100 d-flex justify-content-between">
-                                    <button class="btn btn-dark w-50 m-1">Edit</button>
-                                    <button class="btn btn-dark w-50 m-1">Delete</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col">
-                        <div class="card h-100">
-                            <img src="/public/img/luca-bravo-XJXWbfSo2f0-unsplash.jpg" class="card-img-top">
-                            <div class="card-body">
-                                <h5 class="card-title">Card title</h5>
-                                <p class="card-text">This is a longer card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
-                                <div class="tech-icon fs-3">
-                                    <img src="/public/img/react-js-icon.svg" width="32px">
-                                    <img src="/public/img/node-js-icon.svg" width="32px">
-                                </div>
-                                <div class="card-button w-100 d-flex justify-content-between">
-                                    <button class="btn btn-dark w-50 m-1">Edit</button>
-                                    <button class="btn btn-dark w-50 m-1">Delete</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col">
-                        <div class="card h-100">
-                            <img src="/public/img/luca-bravo-XJXWbfSo2f0-unsplash.jpg" class="card-img-top">
-                            <div class="card-body">
-                                <h5 class="card-title">Card title</h5>
-                                <p class="card-text">This is a longer card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
-                                <div class="tech-icon fs-3">
-                                    <img src="/public/img/react-js-icon.svg" width="32px">
-                                    <img src="/public/img/node-js-icon.svg" width="32px">
-                                </div>
-                                <div class="card-button w-100 d-flex justify-content-between">
-                                    <button class="btn btn-dark w-50 m-1">Edit</button>
-                                    <button class="btn btn-dark w-50 m-1">Delete</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    {{end}}
+                    <!-- Dynamic Content End -->
                 </div>
             </div>
         </div>

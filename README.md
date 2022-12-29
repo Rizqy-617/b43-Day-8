@@ -7,3 +7,5 @@
     - Remove Image Function
     - Finish Detail Project HTML
     - Add Detail Project Function on go 
+    - Change Icon name
+    - Add Project and Display Project is finished !!!!!!

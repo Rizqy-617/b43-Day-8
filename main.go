@@ -2,11 +2,8 @@ package main
 
 import (
 	"fmt"
-	"io"
 	"log"
 	"net/http"
-	"os"
-	"path/filepath"
 	"strconv"
 	"text/template"
 	"time"
@@ -22,6 +19,7 @@ func main() {
 
 	route.HandleFunc("/", homePage).Methods("GET")
 	route.HandleFunc("/project", projectPage).Methods("GET")
+	route.HandleFunc("/project{id}", detailProject).Methods("GET")
 	route.HandleFunc("/project", addProject).Methods("POST")
 	route.HandleFunc("/contact", contactPage).Methods("GET")
 
@@ -57,6 +55,7 @@ func projectPage(w http.ResponseWriter, r *http.Request) {
 	tmpl.Execute(w, nil)
 }
 
+// Struct buat menentukan variable sama tipe data nya
 type dataReceive struct {
 	ID int
 	Projectname string
@@ -64,10 +63,10 @@ type dataReceive struct {
 	Technologies []string
 	Startdate string
 	Enddate string
-	Image string
 	Duration string
 }
 
+// Nanti si variable dataSubmit ini bakal di isi sama value dari function di bawah
 var dataSubmit = []dataReceive{
 
 }
@@ -88,7 +87,7 @@ func addProject(w http.ResponseWriter, r *http.Request) {
 
 	//Buat Durasi
 	const timeFormat = "2006-01-02"
-	timeStartDate, err := time.Parse(timeFormat, startDate)
+	timeStartDate, err := time.Parse(timeFormat, startDate) // januari 20 2003 -> 2003-01-20
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte("Message : " + err.Error()))
@@ -109,37 +108,39 @@ func addProject(w http.ResponseWriter, r *http.Request) {
 		duration =strconv.FormatInt(dayDistance, 10) + " Days"
 	}
 
-	img, imgname, err := r.FormFile("image")
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("Message : " + err.Error()))
-		return
-	}
+	// Input Image Start
+	// img, imgname, err := r.FormFile("image")// Buat ngambil datanya doang
+	// if err != nil {
+	// 	w.WriteHeader(http.StatusInternalServerError)
+	// 	w.Write([]byte("Message : " + err.Error()))
+	// 	return
+	// }
 
-	defer img.Close()
-	dir, err := os.Getwd()
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("Message : " + err.Error()))
-		return
-	}
+	// defer img.Close()
+	// dir, err := os.Getwd() // buat c:/download
+	// if err != nil {
+	// 	w.WriteHeader(http.StatusInternalServerError)
+	// 	w.Write([]byte("Message : " + err.Error()))
+	// 	return
+	// }
 
-	filename := imgname.Filename
-	fileLocation := filepath.Join(dir, "public/uploaded-image", filename)
-	targetFile, err := os.OpenFile(fileLocation, os.O_WRONLY|os.O_CREATE, 0666)
+	// filename := imgname.Filename // Buat negbuat nama file nya
+	// fileLocation := filepath.Join(dir, "public/uploaded-image", filename)
+	// targetFile, err := os.OpenFile(fileLocation, os.O_WRONLY|os.O_CREATE, 0666)
 
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("Message : " + err.Error()))
-		return
-	}
+	// if err != nil {
+	// 	w.WriteHeader(http.StatusInternalServerError)
+	// 	w.Write([]byte("Message : " + err.Error()))
+	// 	return
+	// }
 
-	defer targetFile.Close()
-	if _, err := io.Copy(targetFile, img); err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("Message : " + err.Error()))
-		return
-	}
+	// defer targetFile.Close()
+	// if _, err := io.Copy(targetFile, img); err != nil {
+	// 	w.WriteHeader(http.StatusInternalServerError)
+	// 	w.Write([]byte("Message : " + err.Error()))
+	// 	return
+	// }
+	// Input Image End
 
 	var newData = dataReceive{
 		Projectname: projectname,
@@ -148,7 +149,6 @@ func addProject(w http.ResponseWriter, r *http.Request) {
 		Startdate: startDate,
 		Enddate: endDate,
 		Duration: duration,
-		Image: imgname.Filename,
 	} 
 
 	fmt.Println("Project Name : " + projectname)
@@ -157,7 +157,7 @@ func addProject(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Description : " + description)
 	fmt.Println("Technologies : ", r.Form["technologies"] )
 	fmt.Println("Duration : " + duration)
-	fmt.Println("Image : " + imgname.Filename)
+	// fmt.Println("Image : " + imgname.Filename)
 
 	dataSubmit = append(dataSubmit, newData)
 	
@@ -168,6 +168,20 @@ func contactPage(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 
 	tmpl, err := template.ParseFiles("view/contact.html")
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte("Message : " + err.Error()))
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	tmpl.Execute(w, nil)
+}
+
+func detailProject(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+
+	tmpl, err := template.ParseFiles("view/project-detail.html")
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte("Message : " + err.Error()))

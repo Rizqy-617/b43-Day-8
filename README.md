@@ -11,3 +11,6 @@
     - Add Project and Display Project is finished !!!!!!
 ## Changelog 3
     - Add weeks function to duration and it work!!
+    - Fetching the project by id is complete
+    - Icon fetching is complete
+    

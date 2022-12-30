@@ -48,8 +48,8 @@
             <div class="card m-5 shadow-sm rounded" style="width: 90%;">
                 <div class="card-body">
                     <div class="d-flex flex-column justify-content-center align-items-center">
-                        <h2>My Project</h2>
-                        <div class="row">
+                        <h2>{{ .Projects.Projectname}}</h2>
+                        <div class="row me-2 ms-4">
                             <div class="col-7 mb-3">
                                 <div class="thumbnail-wrap">
                                     <img src="/public/img/luca-bravo-XJXWbfSo2f0-unsplash.jpg" class="img-thumbnail border-0 rounded-3" style="width: 670px; height: 400px;">
@@ -61,26 +61,36 @@
                                     <span class="d-flex align-items-center me-2">
                                         <span class="d-flex flex-row me-3">
                                             <img src="/public/img/icons8-calendar-50.png" style="width: 40px; height: 40px;">
-                                            <h6 class="m-auto ms-2">2022-06-18 s/d. 2022-06-20</h6>
+                                            <h6 class="m-auto ms-2">{{ .Projects.Startdate }} s/d. {{ .Projects.Enddate }}</h6>
                                         </span>
                                     </span>
                                     <span class="d-flex me-2 mt-3">
                                         <span class="d-flex flex-row me-3">
                                             <img src="/public/img/icons8-wall-clock-50.png" style="width: 40px; height: 40px;">
-                                            <h6 class="m-auto ms-2">4 Days</h6>
+                                            <h6 class="m-auto ms-2">{{ .Projects.Duration }}</h6>
                                         </span>
                                     </span>
                                 </div>
                                 <h3 class="mb-3">Technologies</h3>
                                 <div class="d-flex align-items-center flex-wrap">
+                                    {{ range $index, $data := .Projects.Technologies }}
                                     <div class="icon-half">
-                                        <img src="/public/img/node-js-icon.svg" width="30">Node JS</p>
-                                        <img src="/public/img/react-js-icon.svg" width="30">React JS</p>
+                                        {{ if (eq $data "nodejs")}}
+                                        <span class="me-3"><img src="/public/img/nodejs.svg" width="30" style="margin-bottom: 10px; margin-right: 5px;">Node JS</span>
+                                        {{end}}
+                                        {{ if (eq $data "reactjs") }}
+                                        <span class="me-3"><img src="/public/img/reactjs.svg" width="30" style="margin-bottom: 10px; margin-right: 5px;">React JS</span>
+                                        {{end}}
                                     </div>
-                                    <div class="icon-half ms-3">
-                                        <img src="/public/img/nextjs-icon.svg" width="30">Next JS</p>
-                                        <img src="/public/img/typescript-icon.svg" width="30">Typescript JS</p>
+                                    <div class="icon-half">
+                                        {{ if (eq $data "nextjs" )}}
+                                        <span class="me-3"><img src="/public/img/nextjs.svg" width="30" style="margin-bottom: 10px; margin-right: 5px;">Next JS</span>
+                                        {{end}}
+                                        {{ if (eq $data "typescript" )}}
+                                        <span class="me-3"><img src="/public/img/typescript.svg" width="30" style="margin-bottom: 10px; margin-right: 5px;">Typescript</span>
+                                        {{end}}
                                     </div>
+                                    {{end}}
                                 </div>
                             </div>
                         </div>

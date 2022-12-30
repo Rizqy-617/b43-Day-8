@@ -77,7 +77,8 @@ var dataSubmit = []dataReceive{
 }
 
 func addProject(w http.ResponseWriter, r *http.Request) {
-	err := r.ParseMultipartForm(1024)
+	err := r.ParseMultipartForm(10485760) // menggunakan r.ParseMultipartForm karena mengizinkan pengiriman file beda dengan r.ParseForm yang tidak mengizinkan pengiriman gambar
+	// 10485760 itu parameter untuk ukuran batas file nya dalam satuan byte, jadi batas ukuran file yang diterima aku isi 10485760 byte atau 10 mb
 
 	if err != nil {
 		log.Fatal(err)
@@ -87,15 +88,15 @@ func addProject(w http.ResponseWriter, r *http.Request) {
 	startDate := r.PostForm.Get("start-date")
 	endDate := r.PostForm.Get("end-date")
 	description := r.PostForm.Get("description")
-	technologies := r.Form["technologies"]
+	technologies := r.Form["technologies"] // pakai r.Form karena ingin menangkap query string
 
 
-	//Buat Durasi
-	const timeFormat = "2006-01-02"
-	timeStartDate, _:= time.Parse(timeFormat, startDate)
-	timeEndDate, _:= time.Parse(timeFormat, endDate)
+	// Duration Start
+	const timeFormat = "2006-01-02" // Mendeklarasikan format tanggal
+	timeStartDate, _:= time.Parse(timeFormat, startDate) //Mengubah format tanggal start date sesuai dengan const timeFormat
+	timeEndDate, _:= time.Parse(timeFormat, endDate) //Mengubah format tanggal end date sesuai dengan const timeFormat
 
-	// Hitung jaraka
+	// Hitung jarak antara start date dan end date hasilnya akan menjadi milisecond
 	distance := timeEndDate.Sub(timeStartDate)
 
 	//Ubah milisecond menjadi bulan, minggu dan hari
@@ -103,8 +104,10 @@ func addProject(w http.ResponseWriter, r *http.Request) {
 	weekDistance := int(distance.Hours() / 24 / 7)
 	daysDistance := int(distance.Hours() / 24)
 
+	// variable buat menampung durasi yang sudah diolah
 	var duration string
-	if monthDistance >= 1 && daysDistance <= 0{
+	// pengkondisian yang akan mengirimkan durasi yang sudah diolah
+	if monthDistance >= 1 {
 		duration = strconv.Itoa(monthDistance) + " months"
 	} else if monthDistance < 1 && weekDistance >= 1 {
 		duration = strconv.Itoa(weekDistance) + " weeks"
@@ -113,6 +116,7 @@ func addProject(w http.ResponseWriter, r *http.Request) {
 	} else {
 		duration = "0 days"
 	}
+	// Duration End
 
 	// Input Image Start
 	// img, imgname, err := r.FormFile("image")// Buat ngambil datanya doang
@@ -194,6 +198,28 @@ func detailProject(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	id, _ := strconv.Atoi(mux.Vars(r)["id"])
+
+	var dataProject = dataReceive{}
+
+	for index, data := range dataSubmit {
+		if index == id {
+			dataProject = dataReceive{
+				ID: id,
+				Projectname: data.Projectname,
+				Startdate: data.Startdate,
+				Enddate: data.Enddate,
+				Duration: data.Duration,
+				Description: data.Description,
+				Technologies: data.Technologies,
+			}
+		}
+	}
+
+	detailProject := map[string]interface{} {
+		"Projects": dataProject,
+	}
+
 	w.WriteHeader(http.StatusOK)
-	tmpl.Execute(w, nil)
+	tmpl.Execute(w, detailProject)
 }

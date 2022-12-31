@@ -22,6 +22,7 @@ func main() {
 	route.HandleFunc("/project/{id}", detailProject).Methods("GET")
 	route.HandleFunc("/project", addProject).Methods("POST")
 	route.HandleFunc("/contact", contactPage).Methods("GET")
+	route.HandleFunc("/deleteProject/{id}", deleteProject).Methods("GET")
 
 	fmt.Println("Server running on port:8080")
 	http.ListenAndServe("localhost:8080", route)
@@ -118,39 +119,6 @@ func addProject(w http.ResponseWriter, r *http.Request) {
 	}
 	// Duration End
 
-	// Input Image Start
-	// img, imgname, err := r.FormFile("image")// Buat ngambil datanya doang
-	// if err != nil {
-	// 	w.WriteHeader(http.StatusInternalServerError)
-	// 	w.Write([]byte("Message : " + err.Error()))
-	// 	return
-	// }
-
-	// defer img.Close()
-	// dir, err := os.Getwd() // buat c:/download
-	// if err != nil {
-	// 	w.WriteHeader(http.StatusInternalServerError)
-	// 	w.Write([]byte("Message : " + err.Error()))
-	// 	return
-	// }
-
-	// filename := imgname.Filename // Buat negbuat nama file nya
-	// fileLocation := filepath.Join(dir, "public/uploaded-image", filename)
-	// targetFile, err := os.OpenFile(fileLocation, os.O_WRONLY|os.O_CREATE, 0666)
-
-	// if err != nil {
-	// 	w.WriteHeader(http.StatusInternalServerError)
-	// 	w.Write([]byte("Message : " + err.Error()))
-	// 	return
-	// }
-
-	// defer targetFile.Close()
-	// if _, err := io.Copy(targetFile, img); err != nil {
-	// 	w.WriteHeader(http.StatusInternalServerError)
-	// 	w.Write([]byte("Message : " + err.Error()))
-	// 	return
-	// }
-	// Input Image End
 
 	var newData = dataReceive{
 		Projectname: projectname,
@@ -222,4 +190,12 @@ func detailProject(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 	tmpl.Execute(w, detailProject)
+}
+
+func deleteProject(w http.ResponseWriter, r *http.Request) {
+	id, _ := strconv.Atoi(mux.Vars(r)["id"])
+
+	dataSubmit = append(dataSubmit[:id], dataSubmit[id+1:]...)
+
+	http.Redirect(w, r, "/", http.StatusMovedPermanently)
 }

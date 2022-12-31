@@ -13,4 +13,6 @@
     - Add weeks function to duration and it work!!
     - Fetching the project by id is complete
     - Icon fetching is complete
-    
+## Changelog 4
+    - Adjust text height in card
+    -

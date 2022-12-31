@@ -197,5 +197,5 @@ func deleteProject(w http.ResponseWriter, r *http.Request) {
 
 	dataSubmit = append(dataSubmit[:id], dataSubmit[id+1:]...)
 
-	http.Redirect(w, r, "/", http.StatusMovedPermanently)
+	http.Redirect(w, r, "/", http.StatusFound)
 }

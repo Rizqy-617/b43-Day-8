@@ -93,7 +93,9 @@
                             <div class="card-body">
                                 <h5 class="card-title"><a href="/project/{{ $index }}">{{$data.Projectname}}</a></h5>
                                 <h6>Duration: {{$data.Duration}}</h6>
-                                <p class="card-text">{{$data.Description}}</p>
+                                <div class="description-text" style="height: 50px; overflow: hidden; max-width: 100%;">
+                                    <p class="card-text"">{{$data.Description}}</p>
+                                </div>
                                 <div class="tech-icon fs-3">
                                     {{ range $index, $data := $data.Technologies}}
                                     <span class="icon">

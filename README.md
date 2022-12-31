@@ -15,4 +15,5 @@
     - Icon fetching is complete
 ## Changelog 4
     - Adjust text height in card
-    -
+    - Delete Project complete(it need private browser)
+    - Finish 

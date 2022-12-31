@@ -23,6 +23,8 @@ func main() {
 	route.HandleFunc("/project", addProject).Methods("POST")
 	route.HandleFunc("/contact", contactPage).Methods("GET")
 	route.HandleFunc("/deleteProject/{id}", deleteProject).Methods("GET")
+	route.HandleFunc("/editProject/{id}", editProject).Methods("GET")
+	route.HandleFunc("/updateProject/{id}" , updateProject).Methods("POST")
 
 	fmt.Println("Server running on port:8080")
 	http.ListenAndServe("localhost:8080", route)
@@ -129,12 +131,12 @@ func addProject(w http.ResponseWriter, r *http.Request) {
 		Duration: duration,
 	} 
 
-	fmt.Println("Project Name : " + projectname)
-	fmt.Println("Start-date : " + startDate)
-	fmt.Println("End-date : " + endDate)
-	fmt.Println("Description : " + description)
-	fmt.Println("Technologies : ", r.Form["technologies"] )
-	fmt.Println("Duration : " + duration)
+	// fmt.Println("Project Name : " + projectname)
+	// fmt.Println("Start-date : " + startDate)
+	// fmt.Println("End-date : " + endDate)
+	// fmt.Println("Description : " + description)
+	// fmt.Println("Technologies : ", r.Form["technologies"] )
+	// fmt.Println("Duration : " + duration)
 	// fmt.Println("Image : " + imgname.Filename)
 
 	dataSubmit = append(dataSubmit, newData)
@@ -198,4 +200,96 @@ func deleteProject(w http.ResponseWriter, r *http.Request) {
 	dataSubmit = append(dataSubmit[:id], dataSubmit[id+1:]...)
 
 	http.Redirect(w, r, "/", http.StatusFound)
+}
+
+func editProject(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+
+	tmpl, err := template.ParseFiles("view/editProject.html")
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte("Message : " + err.Error()))
+		return
+	}
+
+	id, _ := strconv.Atoi(mux.Vars(r)["id"])
+
+	var editData = dataReceive{}
+
+	for index, data := range dataSubmit {
+		if index == id{
+			editData = dataReceive{
+				ID: id,
+				Projectname: data.Projectname,
+				Startdate: data.Startdate,
+				Enddate: data.Enddate,
+				Duration: data.Duration,
+				Description: data.Description,
+				Technologies: data.Technologies,
+			}
+		}
+	}
+
+	dataEdit := map[string]interface{} {
+		"Projects": editData,
+	}
+
+	tmpl.Execute(w, dataEdit)
+}
+
+func updateProject(w http.ResponseWriter, r *http.Request) {
+	id, _ := strconv.Atoi(mux.Vars(r)["id"])
+	err := r.ParseMultipartForm(10485760) // menggunakan r.ParseMultipartForm karena mengizinkan pengiriman file beda dengan r.ParseForm yang tidak mengizinkan pengiriman gambar
+	// 10485760 itu parameter untuk ukuran batas file nya dalam satuan byte, jadi batas ukuran file yang diterima aku isi 10485760 byte atau 10 mb
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	projectname := r.PostForm.Get("project-name")
+	startDate := r.PostForm.Get("start-date")
+	endDate := r.PostForm.Get("end-date")
+	description := r.PostForm.Get("description")
+	technologies := r.Form["technologies"] // pakai r.Form karena ingin menangkap query string
+
+
+	// Duration Start
+	const timeFormat = "2006-01-02" // Mendeklarasikan format tanggal
+	timeStartDate, _:= time.Parse(timeFormat, startDate) //Mengubah format tanggal start date sesuai dengan const timeFormat
+	timeEndDate, _:= time.Parse(timeFormat, endDate) //Mengubah format tanggal end date sesuai dengan const timeFormat
+
+	// Hitung jarak antara start date dan end date hasilnya akan menjadi milisecond
+	distance := timeEndDate.Sub(timeStartDate)
+
+	//Ubah milisecond menjadi bulan, minggu dan hari
+	monthDistance := int(distance.Hours() / 24 / 30)
+	weekDistance := int(distance.Hours() / 24 / 7)
+	daysDistance := int(distance.Hours() / 24)
+
+	// variable buat menampung durasi yang sudah diolah
+	var duration string
+	// pengkondisian yang akan mengirimkan durasi yang sudah diolah
+	if monthDistance >= 1 {
+		duration = strconv.Itoa(monthDistance) + " months"
+	} else if monthDistance < 1 && weekDistance >= 1 {
+		duration = strconv.Itoa(weekDistance) + " weeks"
+	} else if monthDistance < 1 && daysDistance >= 0 {
+		duration = strconv.Itoa(daysDistance) + " days"
+	} else {
+		duration = "0 days"
+	}
+	// Duration End
+
+
+	var newData = dataReceive{
+		Projectname: projectname,
+		Description: description,
+		Technologies: technologies,
+		Startdate: startDate,
+		Enddate: endDate,
+		Duration: duration,
+	} 
+
+	dataSubmit[id] = newData
+	http.Redirect(w, r, "/", http.StatusMovedPermanently)
 }
